@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import LoginButton from './login-button';
+import Logout from './logout-button';
 
 const BaseNavigation = () => {
     return (
@@ -21,6 +22,7 @@ const BaseNavigation = () => {
                     </li>
                 </ul>
                 <LoginButton />
+                <Logout />
             </div>
         </div>
     );
