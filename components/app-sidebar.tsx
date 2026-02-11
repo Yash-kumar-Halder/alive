@@ -4,24 +4,57 @@ import {
     SidebarGroup,
     SidebarGroupContent,
     SidebarHeader,
+    SidebarMenuButton,
+    SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { HeartPlusIcon } from 'lucide-react';
+import { HeartPlusIcon, Home, LayoutDashboard } from 'lucide-react';
+import Link from 'next/link';
 
 const AppSidebar = () => {
+    const sidebarLinks = [
+        {
+            label: 'Home',
+            href: '/home',
+            icon: Home,
+        },
+        {
+            label: 'Dashboard',
+            href: '/dashboard',
+            icon: LayoutDashboard,
+        },
+    ];
+
     return (
         <Sidebar collapsible="icon">
             <SidebarHeader>
-                <SidebarContent className="overflow-x-hidden">
-                    <SidebarGroup>
+                <SidebarContent className="overflow-x-hidden px-0">
+                    <SidebarGroup className="py-1">
                         <SidebarGroupContent>
-                            <div className="flex w-48 gap-2">
+                            <div className="flex items-center w-48 gap-2">
                                 <HeartPlusIcon size={18} />
-                                <h1>ALIVE</h1>
+                                <h1 className="text-base">ALIVE</h1>
                             </div>
                         </SidebarGroupContent>
                     </SidebarGroup>
+                    {/* <SidebarSeparator /> */}
                 </SidebarContent>
             </SidebarHeader>
+            <SidebarContent className="overflow-x-hidden">
+                <SidebarGroup>
+                    <SidebarGroupContent>
+                        {sidebarLinks.map((link) => (
+                            <SidebarMenuItem key={link.label}>
+                                <Link href={link.href}>
+                                    <SidebarMenuButton>
+                                        <link.icon />
+                                        {link.label}
+                                    </SidebarMenuButton>
+                                </Link>
+                            </SidebarMenuItem>
+                        ))}
+                    </SidebarGroupContent>
+                </SidebarGroup>
+            </SidebarContent>
         </Sidebar>
     );
 };
