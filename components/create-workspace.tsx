@@ -1,61 +1,114 @@
 'use client';
+
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
 
+interface WorkspaceFormValues {
+    name: string;
+    description?: string;
+}
+
 const CreateWorkspace = () => {
-    const handleSubmit = async () => {
-        const response = await fetch('/api/workspaces', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                name: 'My New Workspace',
-                description: 'Optional description',
-            }),
-        });
-        console.log(response);
+    const [loading, setLoading] = useState(false);
+
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors },
+    } = useForm<WorkspaceFormValues>();
+
+    const onSubmit = async (data: WorkspaceFormValues) => {
+        try {
+            setLoading(true);
+
+            const response = await fetch('/api/workspaces', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to create workspace');
+            }
+
+            reset(); // clear form
+            console.log('Workspace created');
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
     };
+
     return (
-        <div>
-            <Dialog>
-                <DialogTrigger>
-                    <Button>Create new workspace</Button>
-                </DialogTrigger>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Create workspace</DialogTitle>
-                        <form className="flex flex-col gap-4 p-4 [&_input]:border [&_input]:border-neutral-600 [&_input]:focus:outline-0 [&_input]:px-2 [&_input]:py-1 [&_input]:rounded-sm  ">
-                            <div className="flex flex-col gap-1">
-                                <label htmlFor="name">Name</label>
-                                <input
-                                    type="text"
-                                    id="name"
-                                />
-                            </div>
-                            <div className="flex flex-col gap-1">
-                                <label htmlFor="description">Description</label>
-                                <input
-                                    type="text"
-                                    id="description"
-                                />
-                            </div>
-                        </form>
-                        <Button
-                            onClick={() => handleSubmit()}
-                            className="cursor-pointer active:scale-95"
-                        >
-                            Create workspace
-                        </Button>
-                    </DialogHeader>
-                </DialogContent>
-            </Dialog>
-        </div>
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button>Create new workspace</Button>
+            </DialogTrigger>
+
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Create workspace</DialogTitle>
+                </DialogHeader>
+
+                <form
+                    onSubmit={handleSubmit(onSubmit)}
+                    className="flex flex-col gap-4 p-4 
+          [&_input]:border 
+          [&_input]:border-neutral-600 
+          [&_input]:focus:outline-0 
+          [&_input]:px-2 
+          [&_input]:py-1 
+          [&_input]:rounded-sm"
+                >
+                    {/* Name */}
+                    <div className="flex flex-col gap-1">
+                        <label htmlFor="name">Name</label>
+                        <input
+                            id="name"
+                            type="text"
+                            {...register('name', {
+                                required: 'Name is required',
+                                minLength: {
+                                    value: 2,
+                                    message: 'Minimum 2 characters',
+                                },
+                            })}
+                        />
+                        {errors.name && (
+                            <span className="text-sm text-red-500">{errors.name.message}</span>
+                        )}
+                    </div>
+
+                    {/* Description */}
+                    <div className="flex flex-col gap-1">
+                        <label htmlFor="description">Description</label>
+                        <input
+                            id="description"
+                            type="text"
+                            {...register('description')}
+                        />
+                    </div>
+
+                    <Button
+                        type="submit"
+                        disabled={loading}
+                        className="cursor-pointer active:scale-95"
+                    >
+                        {loading ? 'Creating...' : 'Create workspace'}
+                    </Button>
+                </form>
+            </DialogContent>
+        </Dialog>
     );
 };
 
