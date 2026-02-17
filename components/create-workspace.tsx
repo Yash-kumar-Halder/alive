@@ -10,6 +10,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { toast } from 'sonner';
 
 interface WorkspaceFormValues {
     name: string;
@@ -23,6 +24,7 @@ const CreateWorkspace = () => {
         register,
         handleSubmit,
         reset,
+        setError,
         formState: { errors },
     } = useForm<WorkspaceFormValues>();
 
@@ -36,11 +38,19 @@ const CreateWorkspace = () => {
                 body: JSON.stringify(data),
             });
 
+            const result = await response.json();
+
             if (!response.ok) {
+                setError('root', {
+                    type: 'server',
+                    message: result?.message || 'Something went wrong',
+                });
                 throw new Error('Failed to create workspace');
             }
 
             reset(); // clear form
+            toast.success(result.message);
+            console.log(result);
             console.log('Workspace created');
         } catch (error) {
             console.error(error);
@@ -98,6 +108,9 @@ const CreateWorkspace = () => {
                             {...register('description')}
                         />
                     </div>
+                    {errors.root?.message && (
+                        <p className="text-destructive">{errors.root?.message}</p>
+                    )}
 
                     <Button
                         type="submit"
