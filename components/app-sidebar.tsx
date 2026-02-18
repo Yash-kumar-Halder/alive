@@ -7,7 +7,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { HeartPlusIcon, Home, LayoutDashboard } from 'lucide-react';
+import { Home, LayoutDashboard } from 'lucide-react';
 import Link from 'next/link';
 
 const AppSidebar = () => {
@@ -31,8 +31,7 @@ const AppSidebar = () => {
                     <SidebarGroup className="py-1">
                         <SidebarGroupContent>
                             <div className="flex items-center w-48 gap-2">
-                                <HeartPlusIcon size={18} />
-                                <h1 className="text-base">ALIVE</h1>
+                                {/* <HeartPlusIcon size={18} /> */}
                             </div>
                         </SidebarGroupContent>
                     </SidebarGroup>
