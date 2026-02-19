@@ -1,4 +1,5 @@
 'use client';
+
 import * as React from 'react';
 import {
     Select,
@@ -9,20 +10,81 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 
+interface Workspace {
+    _id: string;
+    name: string;
+}
+
 const SelectWorkspace = () => {
-    const [alignItemWithTrigger, setAlignItemWithTrigger] = React.useState(true);
+    const [workspaces, setWorkspaces] = React.useState<Workspace[]>([]);
+    const [loading, setLoading] = React.useState(true);
+    const [error, setError] = React.useState<string | null>(null);
+    const [selectedWorkspace, setSelectedWorkspace] = React.useState<string>('');
+
+    React.useEffect(() => {
+        const fetchWorkspaces = async () => {
+            try {
+                setLoading(true);
+
+                const response = await fetch('/api/workspaces');
+                const result = await response.json();
+                console.log(result);
+
+                if (!response.ok) {
+                    throw new Error(result?.message || 'Failed to fetch workspaces');
+                }
+
+                setWorkspaces(result.data);
+
+                // auto select first workspace
+                if (result.data.length > 0) {
+                    setSelectedWorkspace(result.data[0]._id);
+                }
+            } catch (err) {
+                if (err instanceof Error) {
+                    setError(err.message);
+                } else {
+                    setError('Something went wrong');
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchWorkspaces();
+    }, []);
+
+    if (loading) {
+        return <p className="text-sm text-muted-foreground">Loading workspaces...</p>;
+    }
+
+    if (error) {
+        return <p className="text-sm text-red-500">{error}</p>;
+    }
+
+    if (workspaces.length === 0) {
+        return <p className="text-sm text-muted-foreground">No workspaces found</p>;
+    }
+
     return (
-        <Select defaultValue="banana">
+        <Select
+            value={selectedWorkspace}
+            onValueChange={(value) => setSelectedWorkspace(value)}
+        >
             <SelectTrigger className="outline-0">
-                <SelectValue />
+                <SelectValue placeholder="Select workspace" />
             </SelectTrigger>
-            <SelectContent position={alignItemWithTrigger ? 'item-aligned' : 'popper'}>
+
+            <SelectContent>
                 <SelectGroup>
-                    <SelectItem value="apple">Apple</SelectItem>
-                    <SelectItem value="banana">Banana</SelectItem>
-                    <SelectItem value="blueberry">Blueberry</SelectItem>
-                    <SelectItem value="grapes">Grapes</SelectItem>
-                    <SelectItem value="pineapple">Pineapple</SelectItem>
+                    {workspaces.map((workspace) => (
+                        <SelectItem
+                            key={workspace._id}
+                            value={workspace._id}
+                        >
+                            {workspace.name}
+                        </SelectItem>
+                    ))}
                 </SelectGroup>
             </SelectContent>
         </Select>

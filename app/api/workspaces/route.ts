@@ -26,8 +26,13 @@ export async function GET() {
         })
             .sort({ createdAt: -1 })
             .lean();
-
-        return NextResponse.json(workspaces);
+        return NextResponse.json(
+            {
+                success: true,
+                data: workspaces,
+            },
+            { status: 200 }
+        );
     } catch (error) {
         console.error('GET_WORKSPACES_ERROR:', error);
         return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
@@ -92,8 +97,9 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(
             {
-                message: 'Workspace created',
-                workspace,
+                success: true,
+                message: 'Workspace created successfully',
+                data: workspace,
             },
             { status: 201 }
         );
