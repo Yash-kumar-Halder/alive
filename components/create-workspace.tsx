@@ -65,14 +65,14 @@ const CreateWorkspace = () => {
                 <Button>Create new workspace</Button>
             </DialogTrigger>
 
-            <DialogContent>
+            <DialogContent className="bg-[#0D0D0D]">
                 <DialogHeader>
-                    <DialogTitle>Create workspace</DialogTitle>
+                    <DialogTitle className="text-2xl">Create workspace</DialogTitle>
                 </DialogHeader>
 
                 <form
                     onSubmit={handleSubmit(onSubmit)}
-                    className="flex flex-col gap-4 p-4 
+                    className="flex flex-col gap-4 py-4 
           [&_input]:border 
           [&_input]:border-neutral-600 
           [&_input]:focus:outline-0 

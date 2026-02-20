@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 export default function Home() {
     return (
         <div className="w-full min-h-screen p-4">
-            <div className="w-full min-h-[calc(100vh-32px)] flex rounded-md bg-neutral-900 border-red-400">
+            <div className="w-full min-h-[calc(100vh-32px)] flex rounded-md bg-[#0D0D0D] border-red-400">
                 <BaseNavigation />
                 <div className="w-1/2 flex flex-col justify-end py-32 px-18">
                     <h1 className="text-6xl">
