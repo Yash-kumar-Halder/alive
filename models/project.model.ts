@@ -1,11 +1,19 @@
-import mongoose, { Document, Model, Schema } from 'mongoose';
+import mongoose, { Document, Model, Schema, Types } from 'mongoose';
 
 export type KeepAliveInterval = 30 | 60;
+
+export type ProjectRole = 'owner' | 'admin' | 'member';
+
+export interface ProjectMember {
+    user: Types.ObjectId;
+    role: ProjectRole;
+    joinedAt: Date;
+}
 
 export interface IProject extends Document {
     name: string;
     description?: string;
-
+    members: ProjectMember[];
     workspace: mongoose.Types.ObjectId;
     createdBy: mongoose.Types.ObjectId;
 
@@ -23,6 +31,27 @@ export interface IProject extends Document {
     updatedAt: Date;
 }
 
+const ProjectMemberSchema = new Schema<ProjectMember>(
+    {
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: true,
+        },
+        role: {
+            type: String,
+            enum: ['owner', 'admin', 'member'],
+            default: 'member',
+            required: true,
+        },
+        joinedAt: {
+            type: Date,
+            default: Date.now,
+        },
+    },
+    { _id: false }
+);
+
 const ProjectSchema = new Schema<IProject>(
     {
         name: {
@@ -37,6 +66,11 @@ const ProjectSchema = new Schema<IProject>(
             type: String,
             trim: true,
             maxlength: 500,
+        },
+
+        members: {
+            type: [ProjectMemberSchema],
+            default: [],
         },
 
         workspace: {
