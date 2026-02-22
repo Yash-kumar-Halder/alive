@@ -9,6 +9,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { useDispatch, useSelector } from 'react-redux';
+import { setWorkspace } from '@/store/workspaceSlice';
+import { RootState } from '@/store/store';
 
 interface Workspace {
     _id: string;
@@ -16,11 +19,21 @@ interface Workspace {
 }
 
 const SelectWorkspace = () => {
+    const dispatch = useDispatch();
+
+    // Redux (persisted workspace)
+    const persistedWorkspaceId = useSelector(
+        (state: RootState) => state.workspace.currentWorkspaceId
+    );
+
     const [workspaces, setWorkspaces] = React.useState<Workspace[]>([]);
     const [loading, setLoading] = React.useState(true);
     const [error, setError] = React.useState<string | null>(null);
+
+    // Local UI state (for instant select rendering)
     const [selectedWorkspace, setSelectedWorkspace] = React.useState<string>('');
 
+    // Fetch workspaces
     React.useEffect(() => {
         const fetchWorkspaces = async () => {
             try {
@@ -28,18 +41,32 @@ const SelectWorkspace = () => {
 
                 const response = await fetch('/api/workspaces');
                 const result = await response.json();
-                console.log(result);
 
                 if (!response.ok) {
                     throw new Error(result?.message || 'Failed to fetch workspaces');
                 }
 
-                setWorkspaces(result.data);
+                const data: Workspace[] = result.data;
+                setWorkspaces(data);
 
-                // auto select first workspace
-                if (result.data.length > 0) {
-                    setSelectedWorkspace(result.data[0]._id);
-                }
+                if (data.length === 0) return;
+
+                /**
+                 * 🔥 INDUSTRY LOGIC
+                 * 1. If Redux already has workspace (persisted) → use it
+                 * 2. Otherwise → auto-select first workspace
+                 */
+                const initialWorkspace =
+                    data.find((w) => w._id === persistedWorkspaceId) || data[0];
+
+                setSelectedWorkspace(initialWorkspace._id);
+
+                dispatch(
+                    setWorkspace({
+                        id: initialWorkspace._id,
+                        name: initialWorkspace.name,
+                    })
+                );
             } catch (err) {
                 if (err instanceof Error) {
                     setError(err.message);
@@ -52,7 +79,7 @@ const SelectWorkspace = () => {
         };
 
         fetchWorkspaces();
-    }, []);
+    }, [dispatch]);
 
     if (loading) {
         return <p className="text-sm text-muted-foreground">Loading workspaces...</p>;
@@ -69,10 +96,26 @@ const SelectWorkspace = () => {
     return (
         <Select
             value={selectedWorkspace}
-            onValueChange={(value) => setSelectedWorkspace(value)}
+            onValueChange={(value) => {
+                setSelectedWorkspace(value);
+
+                const selected = workspaces.find((workspace) => workspace._id === value);
+
+                if (selected) {
+                    dispatch(
+                        setWorkspace({
+                            id: selected._id,
+                            name: selected.name,
+                        })
+                    );
+                }
+            }}
         >
-            <SelectTrigger className="outline-0">
-                <SelectValue placeholder="Select workspace" />
+            <SelectTrigger className="select-none outline-0 border-0 w-full">
+                <SelectValue
+                    placeholder="Select workspace"
+                    className="select-none"
+                />
             </SelectTrigger>
 
             <SelectContent>

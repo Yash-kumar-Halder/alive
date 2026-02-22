@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Home, LayoutDashboard } from 'lucide-react';
 import Link from 'next/link';
+import SelectWorkspace from './select-workspace';
 
 const AppSidebar = () => {
     const sidebarLinks = [
@@ -25,7 +26,7 @@ const AppSidebar = () => {
     ];
 
     return (
-        <Sidebar collapsible="icon">
+        <Sidebar>
             <SidebarHeader>
                 <SidebarContent className="overflow-x-hidden px-0">
                     <SidebarGroup className="py-1">
@@ -51,6 +52,7 @@ const AppSidebar = () => {
                                 </Link>
                             </SidebarMenuItem>
                         ))}
+                        <SelectWorkspace />
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>

@@ -1,10 +1,10 @@
 import CreateWorkspace from '@/components/create-workspace';
-import SelectWorkspace from '@/components/select-workspace';
+import SelectedWorkspace from '@/components/selected-workspace';
 
 const page = () => {
     return (
         <div>
-            <SelectWorkspace />
+            <SelectedWorkspace />
             <CreateWorkspace />
         </div>
     );
